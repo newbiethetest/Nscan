@@ -12,7 +12,7 @@ ETH_P_IP = 0x0800 # IP protocol
 
 NSCRIPT_PATH = 'nscript'  # NSCRIPT PATH
 
-class Generator(object):
+class Generator(object):#创建对象生成器
     def __init__(self, size):
         self.size = size
         self.inc = size/4
@@ -21,7 +21,7 @@ class Generator(object):
         self.base = -self.inc
         self.num = self.base
         self.index = 0
-    def __iter__(self):
+    def __iter__(self):#创建迭代器
         return self
     def next(self):
         if (self.num+self.inc)>=self.size:
@@ -46,23 +46,23 @@ class Generator(object):
         self.num = num
         self.index = index
 
-class ScriptEngine(object):
-	def __init__(self, imports):
+class ScriptEngine(object):#创建脚本引擎
+	def __init__(self, imports):#初始化函数
 		self.imports = imports
 		self.event = threading.Event()
 		self.queues = {}
 		self.thread = []
-	def Load(self):
+	def Load(self):#载入用户自己编写的函数
 		for script in self.imports:
 			q = Queue.Queue()
 			s = __import__('{}.{}'.format(NSCRIPT_PATH, script),
 				fromlist=[NSCRIPT_PATH])
 			t = threading.Thread(target=s.run,
-				args=(q, self.event))
-			self.thread.append(t)
-			t.setDaemon(True)
-			t.start()
-			self.queues[script] = q
+				args=(q, self.event))#传入队列池，和线程监听事件
+			self.thread.append(t)#线程增加该对象实例
+			t.setDaemon(True)#设置为守护进程，默认false子线程跟随主线程运行完毕结束，这里主线成结束完毕，子线程依然运行（守护子线程）
+			t.start()#开始载入自写模块的运行
+			self.queues[script] = q#
 	def Feed(self, host, port):
 		for scr in self.imports:
 			for r in self.imports[scr]:
